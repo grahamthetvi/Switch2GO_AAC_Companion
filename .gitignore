@@ -1,0 +1,8 @@
+.pio/
+.vscode/
+.idea/
+*.stl
+*.amf
+*.3mf
+*.pyc
+__pycache__/
