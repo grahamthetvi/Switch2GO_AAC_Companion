@@ -38,7 +38,7 @@ static const uint8_t  LED_GLOBAL_MAX_BRIGHTNESS = 100;  // 0-255 safety cap (~40
 static const uint16_t LED_POWER_LIMIT_MA = 500;         // FastLED power limiter
 static const uint32_t DEBOUNCE_MS        = 30;
 static const uint32_t RELAY_MIN_MS       = 200;   // box always sees at least this long a press
-static const uint32_t RELAY_MAX_MS       = 5000;  // safety cap (ASSUMPTION - confirm)
+static const uint32_t RELAY_MAX_MS       = 5000;  // safety cap; force-open if the switch is still held
 static const uint32_t SELECT_FEEDBACK_MS = 800;   // blink after a selection
 static const bool     SELECT_BLINK       = true;
 static const bool     RESTART_FROM_FIRST_AFTER_SELECT = true;  // ASSUMPTION
@@ -72,12 +72,13 @@ Preferences prefs;
 
 // Which physical positions light up for each logical choice.
 // bit0 = position 1 (left) ... bit3 = position 4 (right).
-// Rows 1 and 3 are ASSUMPTIONS to confirm (see build guide Section 2.3).
+// 1 choice lights position 2 only. 3 choices light positions 1, 2, and 3
+// separately (position 4 stays dark). Each choice uses its own relay.
 static const uint8_t LAYOUT[5][4] = {
   {0, 0, 0, 0},
-  {0b0110, 0, 0, 0},                 // 1 choice : middle panel (pos 2+3 together)
+  {0b0010, 0, 0, 0},                 // 1 choice : position 2 only
   {0b0010, 0b0100, 0, 0},            // 2 choices: pos 2, pos 3
-  {0b0001, 0b0110, 0b1000, 0},       // 3 choices: left, middle(2+3), right
+  {0b0001, 0b0010, 0b0100, 0},       // 3 choices: pos 1, pos 2, pos 3
   {0b0001, 0b0010, 0b0100, 0b1000},  // 4 choices: 1, 2, 3, 4
 };
 
@@ -453,7 +454,7 @@ void loop() {
         Serial.printf("[scan] choice %u\n", curChoice + 1); }
       break;
     case State::HOLDING:
-      if (!sw.pressed() && (now - holdStart) >= holdMs()) {   // ASSUMPTION: resume at next choice
+      if (!sw.pressed() && (now - holdStart) >= holdMs()) {   // resume at the next choice
         advance(); stepStart = now; setState(State::SCANNING);
       }
       break;
