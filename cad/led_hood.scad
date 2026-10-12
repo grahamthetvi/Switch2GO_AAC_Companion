@@ -1,6 +1,6 @@
 // LED hood + rail for one trifold position (3 WS2812E LEDs).
-// Starting sizes from the build guide Section 12.1 — measure your strip
-// and retune before printing a full set.
+// Starting sizes — measure your strip and retune before printing a full set.
+// See README heading "Prints".
 // Print mouth-down for clean walls.
 
 $fn = 48;

@@ -1,9 +1,9 @@
 /*
   AAC Switch Scanner - starter firmware
   =====================================
-  STATUS: UNTESTED STARTER CODE. It has not been compiled or run on hardware.
-  Bench-test every feature (Section 8 of the build guide) before using it
-  with a student.
+  STATUS: Desktop compile succeeded once (see firmware/platformio.ini).
+  Never run on hardware. Bench-test every stage in README.md (heading
+  "Build stages") before using it with a student.
 
   Board:     ESP32-WROOM-32 dev board (PlatformIO board = esp32dev)
   Libraries: FastLED 3.6+, NimBLE-Arduino 1.4.x, ESP32-BLE-Keyboard (T-vK)
@@ -42,7 +42,7 @@ static const uint32_t RELAY_MAX_MS       = 5000;  // safety cap; force-open if t
 static const uint32_t SELECT_FEEDBACK_MS = 800;   // blink after a selection
 static const bool     SELECT_BLINK       = true;
 static const bool     RESTART_FROM_FIRST_AFTER_SELECT = true;  // ASSUMPTION
-static const bool     KEEPALIVE_ENABLED  = false; // power-bank keep-alive (Section 4.4)
+static const bool     KEEPALIVE_ENABLED  = false; // power-bank keep-alive; see README "Power bank auto-shutoff"
 static const uint32_t KEEPALIVE_PERIOD_MS = 15000;
 static const uint32_t KEEPALIVE_PULSE_MS  = 500;
 static const char*    DEVICE_NAME = "AAC Scanner";

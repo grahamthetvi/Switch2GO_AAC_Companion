@@ -1,4 +1,4 @@
-// Electronics case (build guide Section 12.3).
+// Electronics case. See README heading "Prints".
 // Interior starting size 140 x 100 x 45 mm. Hole sizes are parameters —
 // measure your boards, jack threads, and button bushing before printing.
 //

@@ -1,4 +1,4 @@
-// Trifold edge clip with a hood-arm mount (build guide Section 12.2).
+// Trifold edge clip with a hood-arm mount. See README heading "Prints".
 // Measure your board thickness and set panel_thickness before printing.
 // Starting sizes only — foam/poster trifolds vary.
 
