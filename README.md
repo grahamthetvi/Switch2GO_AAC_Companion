@@ -49,8 +49,8 @@ Quantities are approximate. Rows marked owned are parts already on hand. Prices 
 | 12 LEDs | WS2812E strip, 5 V, 60 LEDs/m, owned | Cut four segments of 3 LEDs. Red = +5 V, white = GND, green = data. Do not power the rest of the reel from this device. |
 | 2 (of 4 owned) | 2-channel 5 V relay module with optocoupler and H/L trigger jumpers, owned | Board A is positions 1 and 2. Board B is positions 3 and 4. One side is DC+, DC−, IN1, IN2. The other side is NO, COM, NC per channel. |
 | 1 | HiLetgo 4-channel I2C logic level converter, 3.3 V–5 V, bidirectional, owned | The 10-piece listing. Same BSS138-style module described below. One channel carries LED data. Speed on WS2812 data is still a bench test. |
-| 1 | USB-C female breakout, plus two 5.1 kΩ resistors | This breakout has no CC resistors. Add them. See [USB-C CC resistors](#usb-c-cc-resistors). |
-| 2 | 5.1 kΩ resistors, 1/4 W | Ordinary through-hole is fine. One from CC1 to GND, one from CC2 to GND. |
+| 1 | USB-C female breakout, pads V+, D−, D+, CC1, V−, SH | No CC resistors and no CC2 pad. See [USB-C CC resistors](#usb-c-cc-resistors). |
+| 1 | 5.1 kΩ from CC1 to V−, or 4.7 kΩ + 330 Ω + 68 Ω in series | 1/4 W or 1/2 W. This 330 Ω is not the LED data resistor. |
 | 1 | 5 V 3 A lithium-ion power bank, owned | Plus a short USB cable. Auto-shutoff is still a bench test. |
 | 1 | Fuse, about 1.5–2 A | Resettable PTC (polyfuse) in that hold range, or an inline holder with a 2 A fuse. In the +5 V line, right after the USB-C breakout. |
 | 1 | Power switch, SPST slide or rocker, rated at least 3 A DC | Optional, in the cable. The printed case has no rocker cutout. |
@@ -188,37 +188,44 @@ In normal scanning only one position is lit (three LEDs). The firmware caps brig
 
 ### USB-C CC resistors
 
-This USB-C breakout does not include CC resistors. Solder one 5.1 kΩ resistor from CC1 to GND and another from CC2 to GND. Ordinary 1/4 W through-hole parts are fine. Without them, a USB-C-to-C cable usually leaves VBUS at 0 V. Add the resistors before the Stage 1 voltage check. A USB-A-to-C cable can still power the breakout if you are only proving the rest of the rail, because a USB-A source does not need the CC resistors.
+This USB-C breakout does not include CC resistors. Its pads are labeled V+, D−, D+, CC1, V−, and SH. There is no CC2 pad. Solder 4.7 kΩ, then 330 Ω, then 68 Ω, in series from CC1 to V−. That string is about 5.1 kΩ. One 5.1 kΩ resistor from CC1 to V− is the same connection. Leave D+, D−, and SH open. A breakout that also has a CC2 pad needs a second 5.1 kΩ from CC2 to GND. Without the pull-down, a USB-C-to-C cable usually leaves V+ at 0 V. Add the resistor before the Stage 1 voltage check. A USB-A-to-C cable can still power the breakout if you are only proving the rest of the rail, because a USB-A source does not need the CC resistor.
 
 ### Power wiring
 
+```mermaid
+flowchart TD
+  bank["Power bank"] -->|USB cable| usb["USB-C breakout"]
+  usb --> cc1["CC1"]
+  cc1 --> r47["4.7 kΩ"]
+  r47 --> r330["330 Ω"]
+  r330 --> r68["68 Ω"]
+  r68 --> vminus["V−"]
+  vminus --> minus["Breadboard − rail"]
+  usb --> vplus["V+"]
+  vplus --> fuse["2 A fuse"]
+  fuse --> plus["Breadboard + rail"]
+  plus --- cap["1000 µF, long leg on +, stripe on −"]
+  cap --- minus
+  usb -.-> nc["D+  D−  SH left open"]
 ```
-POWER BANK (5 V, 3 A)  
-        |  
-        | USB cable  
-        v  
-+-------------------------------+  
-| USB-C FEMALE BREAKOUT         |  
-|   CC1 --\[5.1 kΩ\]-- GND        |  
-|   CC2 --\[5.1 kΩ\]-- GND        |  
-|   VBUS (+5 V)          GND    |  
-+--------+---------------+------+  
-         |               |  
-    \[FUSE 1.5–2 A\]       |  
-         |               |  
-  \[POWER SWITCH\]         |   optional  
-         |               |  
-      +5 V RAIL       GND RAIL  
-         |  
-         +-- port +5 V .................... port GND  
-         |   \[1000 µF at the port: + leg to +5 V, striped leg to GND\]  
-         |   port DO/DIN is the LED data contact, after the 330–470 Ω resistor  
-         +-- Relay A DC+ ................. Relay A DC−  
-         +-- Relay B DC+ ................. Relay B DC−  
-         +-- Level shifter HV ............ Level shifter GND  
-         +--|\>|-- ESP32 VIN / 5V ......... ESP32 GND  
-              1N5819 optional; stripe toward the ESP32
+
+If you add the power switch, it goes in the red wire between the fuse and the + rail. The 330 Ω above is part of the CC1 string. The LED data resistor is a different 330–470 Ω part, shown under [Wiring](#wiring).
+
+```mermaid
+flowchart LR
+  plus["+5 V rail"] -->|"optional 1N5819, stripe toward VIN"| vin["ESP32 VIN"]
+  plus --> port["LED port +5 V"]
+  plus --> ra["Relay A DC+"]
+  plus --> rb["Relay B DC+"]
+  plus --> hv["Shifter HV"]
+  vin --> gnd["GND rail"]
+  port --> gnd
+  ra --> gnd
+  rb --> gnd
+  hv --> gnd
 ```
+
+Each module connects across the two rails. The ESP32’s other shifter supply, LV, comes from the 3V3 pin, not from the + rail. That wire is in the data drawings below.
 
 The fuse sits immediately after the breakout so a short in the case cannot heat the wiring. The 1000 µF capacitor sits at the port, across that connector’s +5 V and GND contacts. Long leg / + goes to +5 V. The striped leg goes to GND. An electrolytic connected backwards can fail violently.
 
@@ -267,6 +274,80 @@ GPIO27 --\> Relay B IN1  == COM/NO ==\> cord 3 --\> power select box \#2
 GPIO14 --\> Relay B IN2  == COM/NO ==\> cord 4 --\> power select box \#2  
 GPIO32 \<-- student switch jack tip    (sleeve to GND)  
 GPIO33 \<-- pause button               (other leg to GND)
+```
+
+### Data connections
+
+LED data leaves GPIO18, rises to 5 V in the shifter, and then walks from each group’s DOUT to the next group’s DIN. The 330–470 Ω resistor is the only part in that data wire. Plus and ground travel beside it on the port and on every fold connector, in the order +5 V, DO/DIN, GND.
+
+```mermaid
+flowchart LR
+  gpio18["GPIO18"] --> lv1["Shifter LV1"]
+  lv1 --> hv1["Shifter HV1"]
+  hv1 --> series["330–470 Ω"]
+  series --> port["Port DO/DIN"]
+  port --> g1["Group 1 DIN"]
+  g1 --> g2["Group 2 DIN"]
+  g2 --> g3["Group 3 DIN"]
+  g3 --> g4["Group 4 DIN"]
+```
+
+```mermaid
+flowchart LR
+  v33["ESP32 3V3"] --> lv["Shifter LV"]
+  v5["+5 V rail"] --> hv["Shifter HV"]
+  gnd["GND rail"] --> sg["Shifter GND"]
+```
+
+Relay inputs are the GPIO wires. COM and NO are a separate contact on the same module. They go only to that cord’s tip and sleeve, then to the power select box. They do not join a GPIO, the + rail, or GND.
+
+```mermaid
+flowchart TB
+  subgraph pos1 ["Position 1, left, box 1"]
+    direction LR
+    p25["GPIO25"] --> inA1["Relay A IN1"]
+    comA1["COM"] --> tip1["Cord 1 tip"]
+    noA1["NO"] --> sleeve1["Cord 1 sleeve"]
+    tip1 --> box1["Power select box 1"]
+    sleeve1 --> box1
+  end
+  subgraph pos2 ["Position 2, middle-left, box 1"]
+    direction LR
+    p26["GPIO26"] --> inA2["Relay A IN2"]
+    comA2["COM"] --> tip2["Cord 2 tip"]
+    noA2["NO"] --> sleeve2["Cord 2 sleeve"]
+    tip2 --> box2["Power select box 1"]
+    sleeve2 --> box2
+  end
+  subgraph pos3 ["Position 3, middle-right, box 2"]
+    direction LR
+    p27["GPIO27"] --> inB1["Relay B IN1"]
+    comB1["COM"] --> tip3["Cord 3 tip"]
+    noB1["NO"] --> sleeve3["Cord 3 sleeve"]
+    tip3 --> box3["Power select box 2"]
+    sleeve3 --> box3
+  end
+  subgraph pos4 ["Position 4, right, box 2"]
+    direction LR
+    p14["GPIO14"] --> inB2["Relay B IN2"]
+    comB2["COM"] --> tip4["Cord 4 tip"]
+    noB2["NO"] --> sleeve4["Cord 4 sleeve"]
+    tip4 --> box4["Power select box 2"]
+    sleeve4 --> box4
+  end
+```
+
+The student switch and the pause button close their pin to ground. The ESP32’s internal pull-up holds the pin high until that happens.
+
+```mermaid
+flowchart TB
+  tip["Jack tip"] --> r1k["1 kΩ, optional"]
+  r1k --> gpio32["GPIO32"]
+  gpio32 --- nf["100 nF, optional"]
+  nf --- gnd["GND"]
+  sleeve["Jack sleeve"] --> gnd
+  gpio33["GPIO33"] --- pause["Pause button"]
+  pause --- gnd
 ```
 
 A power select box jack expects a switch: tip and sleeve shorted together, with the box supplying its own small sense voltage. An ESP32 pin is a voltage referenced to the ESP32’s ground, so it is the wrong kind of signal to put on that jack. The relay contact is an isolated switch. Each cord lands only on one channel’s COM and NO.
