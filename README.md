@@ -4,7 +4,7 @@ ESP32 single-switch light scanner for a trifold choice board. It lights up to fo
 
 This device is **not** the four-switch `Switch2GO-XXXX` dongle. It advertises as **AAC Scanner**. The iPad app lives in a separate repo.
 
-Nothing in this project has been run on hardware. Behavior and flash commands in this file follow [firmware/src/main.cpp](firmware/src/main.cpp) and [firmware/platformio.ini](firmware/platformio.ini). Work through [Build stages](#build-stages) on the bench before using it with a student.
+Nothing in this project has been run on hardware. Behavior and flash commands in this file follow [firmware/src/main.cpp](file:///home/grahamthetvi/Projects/Switch2GO_AAC_Companion/firmware/src/main.cpp) and [firmware/platformio.ini](file:///home/grahamthetvi/Projects/Switch2GO_AAC_Companion/firmware/platformio.ini). Work through [Build stages](#build-stages) on the bench before using it with a student.
 
 A trifold has four physical positions: 1 on the left panel, 2 and 3 on the middle panel, 4 on the right panel. Each position has three LEDs inside a printed hood. The student sees a patch of light on the choice. One ordinary 3.5 mm switch selects. A pause button on the case stops the scan. Settings come from the iPad app over Bluetooth and are stored on the ESP32.
 
@@ -12,27 +12,28 @@ A trifold has four physical positions: 1 on the left panel, 2 and 3 on the middl
 
 Requires [PlatformIO](https://platformio.org/) (`pio` on the PATH). From this repo:
 
-```bash
-cd firmware
-pio run -e scanner            # compile
-pio run -e scanner -t upload  # flash
-pio device monitor            # 115200 baud
+```
+cd firmware  
+pio run -e scanner            \# compile  
+pio run -e scanner -t upload  \# flash  
+pio device monitor            \# 115200 baud
 ```
 
 Bench sketches are the files in `firmware/src/stages/`. Upload the matching env. Do not paste those files into a new sketch.
 
 | Env | Source | What it tests |
-| --- | --- | --- |
+| - | - | - |
 | `scanner` | `firmware/src/main.cpp` | Full firmware |
-| `stage3_led` | `firmware/src/stages/stage3_led.cpp` | 12 WS2812E LEDs on GPIO18 |
-| `stage4_switch` | `firmware/src/stages/stage4_switch.cpp` | Student jack on GPIO32 |
-| `stage5_pause` | `firmware/src/stages/stage5_pause.cpp` | Pause button on GPIO33 |
-| `stage6_relay` | `firmware/src/stages/stage6_relay.cpp` | Relays on GPIO25, GPIO26, GPIO27, GPIO14 |
-| `stage7_keyboard` | `firmware/src/stages/stage7_keyboard.cpp` | BLE HID keys only |
+| `stage3\_led` | `firmware/src/stages/stage3\_led.cpp` | 12 WS2812E LEDs on GPIO18 |
+| `stage4\_switch` | `firmware/src/stages/stage4\_switch.cpp` | Student jack on GPIO32 |
+| `stage5\_pause` | `firmware/src/stages/stage5\_pause.cpp` | Pause button on GPIO33 |
+| `stage6\_relay` | `firmware/src/stages/stage6\_relay.cpp` | Relays on GPIO25, GPIO26, GPIO27, GPIO14 |
+| `stage7\_keyboard` | `firmware/src/stages/stage7\_keyboard.cpp` | BLE HID keys only |
 
-Example: `pio run -e stage3_led -t upload`
 
-`platformio.ini` pins Espressif32 to 6.x (`espressif32@^6.5.0`), NimBLE-Arduino to 1.x (`^1.4.1`), and ESP32-BLE-Keyboard to the `0.3.2-beta` tag, with `-D USE_NIMBLE`. Stay on platform 6.x. Arduino-ESP32 3.x (Espressif32 7 and newer) can break the keyboard library, and NimBLE 2.x renamed calls that library uses.
+Example: `pio run -e stage3\_led -t upload`
+
+`platformio.ini` pins Espressif32 to 6.x (`espressif32@^6.5.0`), NimBLE-Arduino to 1.x (`^1.4.1`), and ESP32-BLE-Keyboard to the `0.3.2-beta` tag, with `-D USE\_NIMBLE`. Stay on platform 6.x. Arduino-ESP32 3.x (Espressif32 7 and newer) can break the keyboard library, and NimBLE 2.x renamed calls that library uses.
 
 A desktop compile on October 11, 2026 succeeded with espressif32 6.13.0 / Arduino-ESP32 2.0.17, FastLED 3.10.7, NimBLE-Arduino 1.4.3, and ESP32-BLE-Keyboard 0.3.2. That compile was not a hardware test.
 
@@ -43,7 +44,7 @@ If an upload stalls at `Connecting…`, hold the board’s BOOT button until the
 Quantities are approximate. Rows marked owned are parts already on hand. Prices are omitted on purpose.
 
 | Qty | Part | Notes |
-| --- | --- | --- |
+| - | - | - |
 | 1 (+1 spare) | ESP32-WROOM-32 dev board (ESP32 DevKit style) | 30-pin and 38-pin boards label pins differently. Match every wire to your board’s pinout picture before soldering. |
 | 12 LEDs | WS2812E strip, 5 V, 60 LEDs/m, owned | Cut four segments of 3 LEDs. Red = +5 V, white = GND, green = data. Do not power the rest of the reel from this device. |
 | 2 (of 4 owned) | 2-channel 5 V relay module with optocoupler and H/L trigger jumpers, owned | Board A is positions 1 and 2. Board B is positions 3 and 4. One side is DC+, DC−, IN1, IN2. The other side is NO, COM, NC per channel. |
@@ -52,10 +53,10 @@ Quantities are approximate. Rows marked owned are parts already on hand. Prices 
 | 2 | 5.1 kΩ resistors, 1/4 W | Ordinary through-hole is fine. One from CC1 to GND, one from CC2 to GND. |
 | 1 | 5 V 3 A lithium-ion power bank, owned | Plus a short USB cable. Auto-shutoff is still a bench test. |
 | 1 | Fuse, about 1.5–2 A | Resettable PTC (polyfuse) in that hold range, or an inline holder with a 2 A fuse. In the +5 V line, right after the USB-C breakout. |
-| 1 | Power switch, SPST slide or rocker, rated at least 3 A DC | Optional. Avoids unplugging the bank. |
-| 1 | 1000 µF electrolytic capacitor, 10 V or 16 V | Across LED +5 V and GND. The stripe is the negative leg. |
+| 1 | Power switch, SPST slide or rocker, rated at least 3 A DC | Optional, in the cable. The printed case has no rocker cutout. |
+| 1 | 1000 µF electrolytic capacitor, 10 V or 16 V | Across the port’s +5 V and GND. The stripe is the negative leg. |
 | 2–4 | 100 nF ceramic capacitors | Optional decoupling near the ESP32 and the level shifter. |
-| 1 | 330–470 Ω resistor | In series with LED data, close to the first LED. |
+| 1 | 330–470 Ω resistor | In series with LED data, between the level shifter and the port’s DO/DIN contact. |
 | 4–6 | 1 kΩ resistors | Series resistor on the switch input, and transistor bases if you build that fallback. |
 | 1 | Schottky diode, 1N5817 or 1N5819 | Optional. Stops the computer’s USB from feeding the LED and relay rail while you program. |
 | 1 | Panel-mount 3.5 mm mono female jack | Student switch. A stereo jack works if you leave the ring lug unconnected. |
@@ -64,7 +65,8 @@ Quantities are approximate. Rows marked owned are parts already on hand. Prices 
 | 1 | Panel-mount momentary push button, normally open | Pause. Pick a size you can print a hole for. |
 | 1 | Perfboard, or an ESP32 screw-terminal breakout | Final wiring. A solderless breadboard is for the bench stages. |
 | ~8–12 | 2- or 3-position screw terminals (5.08 mm or 3.5 mm pitch) | Power and relay connections you may want to undo. |
-| 5 pairs | 3-pin connectors (JST-SM or JST-XH) | LED groups unplug at the trifold folds. |
+| 1 | Female 3-prong connector, plus its mating plug | Student-wall **port** for the LED strip. Contact order: +5 V, DO/DIN, GND. |
+| 5 pairs | 3-pin connectors (JST-SM or JST-XH) | LED groups unplug at the trifold folds. Same contact order: +5 V, DO/DIN, GND. |
 | ~3 m each | 22 AWG stranded, red and black | +5 V and GND. Silicone insulation is easier to route. |
 | ~5 m | 24–26 AWG stranded, several colors | Data, switch, button, relay inputs. |
 | 1 pack | Dupont jumpers (M-M, M-F, F-F) and a solderless breadboard | Bench tests, before soldering. |
@@ -76,10 +78,11 @@ Quantities are approximate. Rows marked owned are parts already on hand. Prices 
 | 1 + 1, optional | Logic-level N-MOSFET and a 47 Ω 1 W resistor | Only if the power bank shuts off at idle. |
 | — | Filament | Matte black PLA for hoods (hold a print up to a bright light and confirm it is opaque). PLA or PETG for the case. |
 
+
 ## Tools
 
 | Tool | Why |
-| --- | --- |
+| - | - |
 | Multimeter with a continuity beep | Voltages, tip versus sleeve, and shorts before power-up. |
 | Temperature-controlled iron, 0.6–0.8 mm rosin-core solder, flux | Strip pads and jacks. |
 | Wire strippers (20–30 AWG) and flush cutters | Clean strips make sound joints. |
@@ -89,6 +92,7 @@ Quantities are approximate. Rows marked owned are parts already on hand. Prices 
 | Small screwdrivers, tweezers, hot glue | Assembly and strain relief. |
 | Safety glasses, and ventilation or a fume fan | Solder fumes and clipped leads. |
 | USB data cable for the ESP32 | Charge-only cables will not upload. |
+
 
 ## Before you apply power
 
@@ -113,7 +117,7 @@ Solder by heating the pad and the wire together for a second or two, then feedin
 Words used below:
 
 | Term | Meaning |
-| --- | --- |
+| - | - |
 | GPIO | A numbered ESP32 pin the firmware reads or drives. |
 | Rail | The shared +5 V wire, or the shared GND wire. |
 | Pull-up | The ESP32’s internal resistor holds a pin HIGH until a switch connects it to GND. Pressed reads LOW. |
@@ -123,57 +127,64 @@ Words used below:
 | Level shifter | Turns the ESP32’s 3.3 V data into a 5 V data signal for the LEDs. |
 | Strapping pin | An ESP32 pin whose level at power-up changes how the chip boots. The pin table lists the ones to leave alone. |
 
+
 ## Pins
 
 Board labels differ (`25`, `D25`, `G25`). Check your pinout diagram before soldering. PlatformIO board is `esp32dev`.
 
 | ESP32 pin | Connects to | Mode | Notes |
-| --- | --- | --- | --- |
+| - | - | - | - |
 | GPIO18 | Level shifter LV1. HV1 goes through 330–470 Ω to LED DIN | Output | FastLED data. |
-| GPIO25 | Relay A IN1, position 1, cord 1, power select box #1 | Output | |
-| GPIO26 | Relay A IN2, position 2, cord 2, power select box #1 | Output | |
-| GPIO27 | Relay B IN1, position 3, cord 3, power select box #2 | Output | |
-| GPIO14 | Relay B IN2, position 4, cord 4, power select box #2 | Output | May pulse during boot and click relay 4. Untested. If it clicks, move this wire to GPIO13, set `PIN_RELAY[3]` from 14 to 13 in `firmware/src/main.cpp`, and change the pin list in `firmware/src/stages/stage6_relay.cpp`. |
-| GPIO32 | Switch jack tip, through an optional 1 kΩ | INPUT_PULLUP | Sleeve to GND. Pressed = LOW. |
-| GPIO33 | Pause button, other leg to GND | INPUT_PULLUP | Pressed = LOW. |
+| GPIO25 | Relay A IN1, position 1, cord 1, power select box \#1 | Output |  |
+| GPIO26 | Relay A IN2, position 2, cord 2, power select box \#1 | Output |  |
+| GPIO27 | Relay B IN1, position 3, cord 3, power select box \#2 | Output |  |
+| GPIO14 | Relay B IN2, position 4, cord 4, power select box \#2 | Output | May pulse during boot and click relay 4. Untested. If it clicks, move this wire to GPIO13, set `PIN\_RELAY\[3\]` from 14 to 13 in `firmware/src/main.cpp`, and change the pin list in `firmware/src/stages/stage6\_relay.cpp`. |
+| GPIO32 | Switch jack tip, through an optional 1 kΩ | INPUT\_PULLUP | Sleeve to GND. Pressed = LOW. |
+| GPIO33 | Pause button, other leg to GND | INPUT\_PULLUP | Pressed = LOW. |
 | GPIO4 | Optional keep-alive MOSFET gate, through about 100 Ω | Output | Leave disconnected unless you build that circuit. Firmware leaves it off. |
 | 3V3 | Level shifter LV | Power out | Do not feed 5 V into this pin. |
 | VIN / 5V | +5 V rail, optionally through the 1N5819 | Power in | Stripe of the diode toward VIN. |
 | GND | GND rail | — | Use more than one GND pin if that is easier. |
 
+
 Leave these pins unwired:
 
 - GPIO0, GPIO2, GPIO5, GPIO12, and GPIO15 are strapping pins. GPIO12 held HIGH at boot can select the wrong flash voltage and the board will not start. GPIO0 is the BOOT button.
+
 - GPIO1 and GPIO3 are USB serial TX and RX.
+
 - GPIO6–GPIO11 are tied to the onboard flash.
+
 - GPIO34, GPIO35, GPIO36 (VP), and GPIO39 (VN) are input-only and have no internal pull-up.
+
 - EN is reset. It reboots the chip and drops Bluetooth. It is not the pause button.
 
-```mermaid
-flowchart LR
-  PB["Power bank 5V 3A"] -->|USB cable| USBC["USB-C breakout plus 5.1k CC resistors"]
-  USBC --> FUSE["Fuse about 1.5-2A"] --> PSW["Power switch optional"] --> RAIL["+5V rail and 1000uF cap"]
-  RAIL --> ESP["ESP32 VIN"]
-  RAIL --> LEDS["12x WS2812E"]
-  RAIL --> RA["Relay A"]
-  RAIL --> RB["Relay B"]
-  RAIL --> LS["Level shifter HV"]
-  ESP -->|3V3 and GPIO18| LS
-  LS -->|"330-470 ohm"| LEDS
-  ESP -->|GPIO25 GPIO26| RA
-  ESP -->|GPIO27 GPIO14| RB
-  SWJ["Switch jack tip"] -->|GPIO32| ESP
-  BTN["Pause button"] -->|GPIO33| ESP
-  RA -->|COM and NO| C12["Cords 1 and 2"] --> PSB1["Power select box 1"]
-  RB -->|COM and NO| C34["Cords 3 and 4"] --> PSB2["Power select box 2"]
-  ESP -.->|BLE keyboard and config| IPAD["iPad"]
+```
+flowchart LR  
+  PB\["Power bank 5V 3A"\] --\>|USB cable| USBC\["USB-C breakout plus 5.1k CC resistors"\]  
+  USBC --\> FUSE\["Fuse about 1.5-2A"\] --\> PSW\["Power switch optional"\] --\> RAIL\["+5V rail and 1000uF cap"\]  
+  RAIL --\> ESP\["ESP32 VIN"\]  
+  RAIL --\> PORT\["Port +5V, DO/DIN, GND"\]  
+  PORT --\> LEDS\["12x WS2812E"\]  
+  RAIL --\> RA\["Relay A"\]  
+  RAIL --\> RB\["Relay B"\]  
+  RAIL --\> LS\["Level shifter HV"\]  
+  ESP --\>|3V3 and GPIO18| LS  
+  LS --\>|"330-470 ohm"| PORT  
+  ESP --\>|GPIO25 GPIO26| RA  
+  ESP --\>|GPIO27 GPIO14| RB  
+  SWJ\["Switch jack tip"\] --\>|GPIO32| ESP  
+  BTN\["Pause button"\] --\>|GPIO33| ESP  
+  RA --\>|COM and NO| C12\["Cords 1 and 2"\] --\> PSB1\["Power select box 1"\]  
+  RB --\>|COM and NO| C34\["Cords 3 and 4"\] --\> PSB2\["Power select box 2"\]  
+  ESP -.-\>|BLE keyboard and config| IPAD\["iPad"\]
 ```
 
 ## Power
 
 Twelve WS2812-type LEDs at full white can draw on the order of 0.7 A (about 60 mA each; check the WS2812E datasheet for your strip). A full 5 m reel is hundreds of LEDs and is far past a 3 A bank. Cut off the 12 LEDs this device uses and do not power the rest of the reel from it.
 
-In normal scanning only one position is lit (three LEDs). The firmware caps brightness with `LED_GLOBAL_MAX_BRIGHTNESS = 100` (about 40% of 255) and FastLED’s limiter at 500 mA. Tune brightness on site. A dim room often looks right at a lower setting.
+In normal scanning only one position is lit (three LEDs). The firmware caps brightness with `LED\_GLOBAL\_MAX\_BRIGHTNESS = 100` (about 40% of 255) and FastLED’s limiter at 500 mA. Tune brightness on site. A dim room often looks right at a lower setting.
 
 ### USB-C CC resistors
 
@@ -182,44 +193,46 @@ This USB-C breakout does not include CC resistors. Solder one 5.1 kΩ resistor f
 ### Power wiring
 
 ```
-POWER BANK (5 V, 3 A)
-        |
-        | USB cable
-        v
-+-------------------------------+
-| USB-C FEMALE BREAKOUT         |
-|   CC1 --[5.1 kΩ]-- GND        |
-|   CC2 --[5.1 kΩ]-- GND        |
-|   VBUS (+5 V)          GND    |
-+--------+---------------+------+
-         |               |
-    [FUSE 1.5–2 A]       |
-         |               |
-  [POWER SWITCH]         |   optional
-         |               |
-      +5 V RAIL       GND RAIL
-         |
-         +-- LED red (+5 V) .............. LED white (GND)
-         |   [1000 µF at the LED plug: + leg to +5 V, striped leg to GND]
-         +-- Relay A DC+ ................. Relay A DC−
-         +-- Relay B DC+ ................. Relay B DC−
-         +-- Level shifter HV ............ Level shifter GND
-         +--|>|-- ESP32 VIN / 5V ......... ESP32 GND
+POWER BANK (5 V, 3 A)  
+        |  
+        | USB cable  
+        v  
++-------------------------------+  
+| USB-C FEMALE BREAKOUT         |  
+|   CC1 --\[5.1 kΩ\]-- GND        |  
+|   CC2 --\[5.1 kΩ\]-- GND        |  
+|   VBUS (+5 V)          GND    |  
++--------+---------------+------+  
+         |               |  
+    \[FUSE 1.5–2 A\]       |  
+         |               |  
+  \[POWER SWITCH\]         |   optional  
+         |               |  
+      +5 V RAIL       GND RAIL  
+         |  
+         +-- port +5 V .................... port GND  
+         |   \[1000 µF at the port: + leg to +5 V, striped leg to GND\]  
+         |   port DO/DIN is the LED data contact, after the 330–470 Ω resistor  
+         +-- Relay A DC+ ................. Relay A DC−  
+         +-- Relay B DC+ ................. Relay B DC−  
+         +-- Level shifter HV ............ Level shifter GND  
+         +--|\>|-- ESP32 VIN / 5V ......... ESP32 GND  
               1N5819 optional; stripe toward the ESP32
 ```
 
-The fuse sits immediately after the breakout so a short in the case cannot heat the wiring. The 1000 µF capacitor sits at the LED plug. Long leg / + goes to +5 V. The striped leg goes to GND. An electrolytic connected backwards can fail violently.
+The fuse sits immediately after the breakout so a short in the case cannot heat the wiring. The 1000 µF capacitor sits at the port, across that connector’s +5 V and GND contacts. Long leg / + goes to +5 V. The striped leg goes to GND. An electrolytic connected backwards can fail violently.
 
 Estimates to check with a USB power meter:
 
 | Load | Typical while scanning | Worst case |
-| --- | --- | --- |
+| - | - | - |
 | ESP32 + BLE | about 0.10–0.15 A | about 0.25 A in radio peaks |
 | 3 LEDs at the brightness cap | about 0.05–0.08 A | depends on color |
 | 12 LEDs, full white, cap removed | — | about 0.72 A (the firmware cap is there to prevent this) |
 | 12 LEDs “off” | about 0.01 A | about 0.5–1 mA each; check your strip |
 | One relay coil | 0 A most of the time | about 0.07–0.09 A (read the part number on the relay) |
 | Level shifter and relay-board LEDs | about 0.01 A | about 0.03 A |
+
 
 A normal scan is roughly 0.2–0.3 A. Stacking the uncapped 12-LED figure, every relay coil, and the ESP32 peaks is about 1.3–1.4 A. The firmware closes only one relay, and the brightness cap limits LED current to 500 mA, so a real scan stays under the 1.5–2 A fuse and the 3 A bank.
 
@@ -235,25 +248,25 @@ Many banks turn off when the load stays under a threshold that is often somewher
 
 Test: run a normal scan for 30–60 minutes through a USB power meter and watch for a cutoff. If the bank shuts off, use an always-on or low-current mode if the bank has one, or use a bank made for small loads.
 
-Optional keep-alive, only after that test fails. A logic-level N-MOSFET switches a 47 Ω 1 W resistor across 5 V (about 100 mA, about 0.5 W while on) for 0.5 s every 15 s. GPIO4 drives the gate. The resistor gets warm; give it air. `KEEPALIVE_ENABLED` in `firmware/src/main.cpp` is `false` until you build this circuit. Shorten the pulse until the bank just stays awake. Do not raise LED brightness to keep the bank on. That changes what the student sees.
+Optional keep-alive, only after that test fails. A logic-level N-MOSFET switches a 47 Ω 1 W resistor across 5 V (about 100 mA, about 0.5 W while on) for 0.5 s every 15 s. GPIO4 drives the gate. The resistor gets warm; give it air. `KEEPALIVE\_ENABLED` in `firmware/src/main.cpp` is `false` until you build this circuit. Shorten the pulse until the bank just stays awake. Do not raise LED brightness to keep the bank on. That changes what the student sees.
 
 ```
-+5 V rail --[47 Ω 1 W]-- drain
-GPIO4 --[100 Ω]-- gate     logic-level N-MOSFET
-gate --[100 kΩ]-- GND      (holds the MOSFET off at boot)
++5 V rail --\[47 Ω 1 W\]-- drain  
+GPIO4 --\[100 Ω\]-- gate     logic-level N-MOSFET  
+gate --\[100 kΩ\]-- GND      (holds the MOSFET off at boot)  
 source -------------------- GND
 ```
 
 ## Wiring
 
 ```
-GPIO18 --> shifter LV1 -> HV1 --> 330–470 Ω --> LED group 1 -> 2 -> 3 -> 4
-GPIO25 --> Relay A IN1  == COM/NO ==> cord 1 --> power select box #1
-GPIO26 --> Relay A IN2  == COM/NO ==> cord 2 --> power select box #1
-GPIO27 --> Relay B IN1  == COM/NO ==> cord 3 --> power select box #2
-GPIO14 --> Relay B IN2  == COM/NO ==> cord 4 --> power select box #2
-GPIO32 <-- student switch jack tip    (sleeve to GND)
-GPIO33 <-- pause button               (other leg to GND)
+GPIO18 --\> shifter LV1 -\> HV1 --\> 330–470 Ω --\> port (+5 V, DO/DIN, GND) --\> LED group 1 -\> 2 -\> 3 -\> 4  
+GPIO25 --\> Relay A IN1  == COM/NO ==\> cord 1 --\> power select box \#1  
+GPIO26 --\> Relay A IN2  == COM/NO ==\> cord 2 --\> power select box \#1  
+GPIO27 --\> Relay B IN1  == COM/NO ==\> cord 3 --\> power select box \#2  
+GPIO14 --\> Relay B IN2  == COM/NO ==\> cord 4 --\> power select box \#2  
+GPIO32 \<-- student switch jack tip    (sleeve to GND)  
+GPIO33 \<-- pause button               (other leg to GND)
 ```
 
 A power select box jack expects a switch: tip and sleeve shorted together, with the box supplying its own small sense voltage. An ESP32 pin is a voltage referenced to the ESP32’s ground, so it is the wrong kind of signal to put on that jack. The relay contact is an isolated switch. Each cord lands only on one channel’s COM and NO.
@@ -265,27 +278,31 @@ WS2812-family LEDs on 5 V usually want a data high around 0.7 × 5 V. The ESP32�
 The owned part is the HiLetgo 4-channel I2C bidirectional module (BSS138 and pull-ups, the same style of board as the common 4-channel I2C shifters). Hookup:
 
 - LV to the ESP32 3V3 pin
+
 - HV to the +5 V rail
+
 - GND (either or both GND pins) to common ground
+
 - LV1 from ESP32 GPIO18
-- HV1 through 330–470 Ω to the green DIN of the first LED group
+
+- HV1 through 330–470 Ω to the port’s DO/DIN contact, which goes to the green DIN of the first LED group
 
 ```
-ESP32 3V3  ------------------> LV
-ESP32 GND  ------------------> GND          HiLetgo shifter
-+5 V rail  ------------------> HV
-GND rail   ------------------> GND
-ESP32 GPIO18 ----------------> LV1
-                                 HV1 --[330–470 Ω]--> LED DIN (green)
-
-+5 V rail --+-- red   (+5 V) --> group 1
-            |  (+)
-         [1000 µF]
-            |  (stripe −)
-GND rail  --+-- white (GND)  --> group 1
+ESP32 3V3  ------------------\> LV  
+ESP32 GND  ------------------\> GND          HiLetgo shifter  
++5 V rail  ------------------\> HV  
+GND rail   ------------------\> GND  
+ESP32 GPIO18 ----------------\> LV1  
+                                 HV1 --\[330–470 Ω\]--\> port DO/DIN --\> group 1 DIN  
+  
++5 V rail --+-- port +5 V  --\> group 1 +5 V  
+            |  (+)  
+         \[1000 µF\]  
+            |  (stripe −)  
+GND rail  --+-- port GND   --\> group 1 GND
 ```
 
-These modules were made for slow buses such as I2C. WS2812 data is 800 kHz, with pulses around 0.4 µs, and the rising edge depends on pull-up resistors. Flicker, wrong colors, or later groups misbehaving are the signs it is too slow. That speed check is Stage 3 and is still open. Fallbacks are at the end of this section. The 330–470 Ω resistor stays next to the first DIN either way.
+These modules were made for slow buses such as I2C. WS2812 data is 800 kHz, with pulses around 0.4 µs, and the rising edge depends on pull-up resistors. Flicker, wrong colors, or later groups misbehaving are the signs it is too slow. That speed check is Stage 3 and is still open. Fallbacks are at the end of this section. The 330–470 Ω resistor stays between the shifter and the port’s DO/DIN contact either way.
 
 A 74HC595 shift register does not convert voltage levels. This build does not use one.
 
@@ -296,43 +313,46 @@ The strip has arrows. Data flows in the arrow’s direction. Always feed the DIN
 Firmware index order, first LED in the chain is index 0:
 
 | Position | Panel | LED indexes |
-| --- | --- | --- |
+| - | - | - |
 | 1 | Left | 0–2 |
 | 2 | Middle-left | 3–5 |
 | 3 | Middle-right | 6–8 |
 | 4 | Right | 9–11 |
 
-```
-LEFT                    MIDDLE                         RIGHT
-[hood 1 / pos 1]        [hood 2 / pos 2] [hood 3]      [hood 4 / pos 4]
-LEDs 0-2                LEDs 3-5         LEDs 6-8      LEDs 9-11
 
-Device -> G1 DIN .. G1 DOUT -> G2 DIN .. G2 DOUT -> G3 DIN .. G3 DOUT -> G4 DIN
-Each link is three wires: +5 V (22 AWG), GND (22 AWG), DATA (24–26 AWG).
+```
+LEFT                    MIDDLE                         RIGHT  
+\[hood 1 / pos 1\]        \[hood 2 / pos 2\] \[hood 3\]      \[hood 4 / pos 4\]  
+LEDs 0-2                LEDs 3-5         LEDs 6-8      LEDs 9-11  
+  
+Case port -\> G1 DIN .. G1 DOUT -\> G2 DIN .. G2 DOUT -\> G3 DIN .. G3 DOUT -\> G4 DIN  
+Each link is three wires: +5 V (22 AWG), GND (22 AWG), DATA (24–26 AWG).  
 Put a 3-pin connector at each trifold fold.
 ```
+
+The student-wall opening labeled **port** is that first plug: a female 3-prong connector. Contact order is +5 V, DO/DIN, GND. DO is the level-shifter output after the 330–470 Ω resistor, and it lands on group 1 DIN. Use the same order on every fold connector. Power off before mating the port. The 1000 µF capacitor sits at this plug, striped leg to GND.
 
 Runs up to about a meter between groups are usually fine, because each LED regenerates the data. Confirm that with your panel spacing. If the far groups look yellow or red instead of white, also run +5 V and GND straight to group 4. At these currents that is unlikely.
 
 ### Relay modules
 
-Set both jumpers on both boards to H (high-level trigger). In H mode the relay turns on when IN is HIGH and off when IN is LOW. `RELAY_ACTIVE_HIGH` in the firmware is `true` for that.
+Set both jumpers on both boards to H (high-level trigger). In H mode the relay turns on when IN is HIGH and off when IN is LOW. `RELAY\_ACTIVE\_HIGH` in the firmware is `true` for that.
 
 H mode is the one to use with a 3.3 V GPIO. In L mode the optocoupler LED is typically powered from the board’s 5 V, and a 3.3 V “high” can leave the relay partly on. H mode’s off state is 0 V. During ESP32 boot the pins sit low or float, so H mode stays off. Still watch the first second: GPIO14 is a separate boot question, listed under [Still to confirm on the bench](#still-to-confirm-on-the-bench).
 
 Whether 3.3 V reliably clicks these boards in H mode is still a bench test (Stage 6). Do that test before you trust a channel.
 
 ```
-+5 V rail ----> DC+ (VCC)
-GND rail  ----> DC− (GND)     Jumper CH1: H    Jumper CH2: H
-GPIO25    ----> IN1           (board B uses GPIO27 and GPIO14, cords 3 and 4)
-GPIO26    ----> IN2
-
-CH1  COM o---- cord 1 TIP
-     NO  o---- cord 1 SLEEVE
-     NC     unused
-CH2  COM o---- cord 2 TIP
-     NO  o---- cord 2 SLEEVE
++5 V rail ----\> DC+ (VCC)  
+GND rail  ----\> DC− (GND)     Jumper CH1: H    Jumper CH2: H  
+GPIO25    ----\> IN1           (board B uses GPIO27 and GPIO14, cords 3 and 4)  
+GPIO26    ----\> IN2  
+  
+CH1  COM o---- cord 1 TIP  
+     NO  o---- cord 1 SLEEVE  
+     NC     unused  
+CH2  COM o---- cord 2 TIP  
+     NO  o---- cord 2 SLEEVE  
      NC     unused
 ```
 
@@ -351,12 +371,12 @@ Plugging or unplugging a plug can briefly short tip to sleeve and look like a pr
 Jacks differ. Plug in a mono cable and use continuity to see which lug beeps to the tip and which to the sleeve. Do this on your jack rather than trusting a drawing.
 
 ```
-Student switch ==> [panel 3.5 mm jack]
-  TIP lug    --[1 kΩ optional]--> GPIO32 (INPUT_PULLUP)
-                      |
-               [100 nF optional]
-                      |
-  SLEEVE lug ---------+----------> GND
+Student switch ==\> \[panel 3.5 mm jack\]  
+  TIP lug    --\[1 kΩ optional\]--\> GPIO32 (INPUT\_PULLUP)  
+                      |  
+               \[100 nF optional\]  
+                      |  
+  SLEEVE lug ---------+----------\> GND
 ```
 
 ### Pause button
@@ -364,7 +384,7 @@ Student switch ==> [panel 3.5 mm jack]
 BOOT is GPIO0. Holding it low at reset puts the ESP32 in firmware-download mode, and the button sits on the module inside the case. EN resets the chip and drops Bluetooth. The pause control is a separate panel button on GPIO33 to GND, using the internal pull-up. It has no boot effect.
 
 ```
-GPIO33 (INPUT_PULLUP) ------o  normally open momentary  o------ GND
+GPIO33 (INPUT\_PULLUP) ------o  normally open momentary  o------ GND
 ```
 
 Hold this button while power is applied to start config-only Bluetooth (no keyboard). That path is the iOS fallback in the BLE section. A normal press, after boot, pauses and resumes.
@@ -372,13 +392,14 @@ Hold this button while power is applied to start config-only Bluetooth (no keybo
 ### Output cords
 
 | Position | Board | Channel | Cord | Goes to |
-| --- | --- | --- | --- | --- |
-| 1 left | A | IN1 / CH1 | 1 | Power select box #1 |
-| 2 middle-left | A | IN2 / CH2 | 2 | Power select box #1 |
-| 3 middle-right | B | IN1 / CH1 | 3 | Power select box #2 |
-| 4 right | B | IN2 / CH2 | 4 | Power select box #2 |
+| - | - | - | - | - |
+| 1 left | A | IN1 / CH1 | 1 | Power select box \#1 |
+| 2 middle-left | A | IN2 / CH2 | 2 | Power select box \#1 |
+| 3 middle-right | B | IN1 / CH1 | 3 | Power select box \#2 |
+| 4 right | B | IN2 / CH2 | 4 | Power select box \#2 |
 
-With two choices the firmware lights positions 2 and 3, so one cord goes to box #1 and one to box #2. With one choice only cord 2 is used. With three choices cords 1 and 2 go to box #1 and cord 3 goes to box #2. Cord 4 is unused until you run four choices. The teacher picks the port and the mode on each box.
+
+With two choices the firmware lights positions 2 and 3, so one cord goes to box \#1 and one to box \#2. With one choice only cord 2 is used. With three choices cords 1 and 2 go to box \#1 and cord 3 goes to box \#2. Cord 4 is unused until you run four choices. The teacher picks the port and the mode on each box.
 
 **Option A, hard-wired cords.** Cut two mono male-to-male 3.5 mm cables in half. That yields four pigtails. Continuity-test which conductor is the tip and which is the sleeve (the shield is usually the sleeve; confirm it). Tip to COM, sleeve to NO. Knot or clamp the cable inside the case. Label 1, 2, 3, 4 with colored heat-shrink.
 
@@ -387,8 +408,8 @@ With two choices the firmware lights positions 2 and 3, so one cord goes to box 
 A stereo plug in a mono jack lets the ring touch the sleeve. That is harmless here. The cord wires still go only to COM and NO.
 
 ```
-Relay COM o---- tip wire ----+
-                              +=== 3.5 mm mono plug ===> power select box
+Relay COM o---- tip wire ----+  
+                              +=== 3.5 mm mono plug ===\> power select box  
 Relay NO  o---- sleeve wire -+
 ```
 
@@ -399,22 +420,24 @@ Use these only when the matching bench stage fails. They are untested, same as t
 **LED data, in the order to try them.**
 
 1. **74AHCT125** (or SN74HCT245), powered from 5 V. The “T” inputs treat 3.3 V as high, and the outputs are fast 5 V. For a DIP-14 74AHCT125 the usual pins are: pin 14 = 5 V, pin 7 = GND, pin 1 (1OE) = GND, pin 2 (1A) from GPIO18, pin 3 (1Y) through 330 Ω to DIN. Tie unused inputs (pins 5, 9, 12) to GND and their OE pins (4, 10, 13) to 5 V. Confirm the pinout in the datasheet for your package.
-2. **Sacrificial pixel.** One extra WS2812 next to the ESP32, powered through a 1N4001 so it runs near 4.3 V. Its input threshold drops enough to accept 3.3 V, and it resends a clean signal to the 12 real LEDs. That extra pixel has to be index 0 and stay dark, with the real LEDs at indexes 1–12. `NUM_LEDS` is currently `NUM_POSITIONS * LEDS_PER_POS` (12), and the render loop writes those indexes directly, so this fallback needs a one-pixel offset or the hoods light the wrong groups. Bench-test it.
+
+2. **Sacrificial pixel.** One extra WS2812 next to the ESP32, powered through a 1N4001 so it runs near 4.3 V. Its input threshold drops enough to accept 3.3 V, and it resends a clean signal to the 12 real LEDs. That extra pixel has to be index 0 and stay dark, with the real LEDs at indexes 1–12. `NUM\_LEDS` is currently `NUM\_POSITIONS \* LEDS\_PER\_POS` (12), and the render loop writes those indexes directly, so this fallback needs a one-pixel offset or the hoods light the wrong groups. Bench-test it.
+
 3. **Direct short wire.** GPIO18 through 330 Ω to DIN, no shifter, first LED within about 30 cm. Outside the LED input spec. Acceptable on a prototype if Stage 3 stays clean on the real wire lengths.
 
 **Relay input, if the 3.3 V touch test does not click.** One NPN per channel (2N2222 or 2N3904), jumper on L:
 
 ```
-GPIO --[1 kΩ]-- base
-emitter ----------- GND
+GPIO --\[1 kΩ\]-- base  
+emitter ----------- GND  
 collector -------- relay IN
 ```
 
-GPIO high pulls IN to ground, and L mode then turns the relay on, so `RELAY_ACTIVE_HIGH` stays `true`. At boot the GPIO is low, the transistor is off, and the relay is off. Flat-side-facing-you with legs down is often E-B-C on these parts; confirm the datasheet.
+GPIO high pulls IN to ground, and L mode then turns the relay on, so `RELAY\_ACTIVE\_HIGH` stays `true`. At boot the GPIO is low, the transistor is off, and the relay is off. Flat-side-facing-you with legs down is often E-B-C on these parts; confirm the datasheet.
 
 Three spare channels on the HiLetgo board can lift relay inputs to 5 V (a second module covers the fourth). The transistor is the more predictable of the two.
 
-**JD-VCC boards.** Remove the JD-VCC jumper. JD-VCC = 5 V for the coils, VCC = ESP32 3.3 V for the optocouplers, GND = common ground. A GPIO low turns the relay on. Set `RELAY_ACTIVE_HIGH` to `false`. With VCC at 3.3 V, a high output fully turns the optocoupler off.
+**JD-VCC boards.** Remove the JD-VCC jumper. JD-VCC = 5 V for the coils, VCC = ESP32 3.3 V for the optocouplers, GND = common ground. A GPIO low turns the relay on. Set `RELAY\_ACTIVE\_HIGH` to `false`. With VCC at 3.3 V, a high output fully turns the optocoupler off.
 
 ## Build stages
 
@@ -424,13 +447,13 @@ Stop at the first stage that fails. The pass line is the gate to the next stage.
 
 Install PlatformIO. From `firmware/`:
 
-```bash
-pio run -e scanner
-pio run -e stage4_switch -t upload
+```
+pio run -e scanner  
+pio run -e stage4\_switch -t upload  
 pio device monitor
 ```
 
-`scanner` proves the libraries compile. `stage4_switch` is safe with nothing wired: it only reads GPIO32 with the internal pull-up. **Pass:** the upload finishes, and the monitor opens at 115200 and stays quiet. Hold BOOT if the upload sits on `Connecting…`.
+`scanner` proves the libraries compile. `stage4\_switch` is safe with nothing wired: it only reads GPIO32 with the internal pull-up. **Pass:** the upload finishes, and the monitor opens at 115200 and stays quiet. Hold BOOT if the upload sits on `Connecting…`.
 
 ### Stage 1: Power rail, ESP32 not attached yet
 
@@ -438,28 +461,28 @@ Wire USB-C breakout, with both 5.1 kΩ CC resistors, then the fuse, then the opt
 
 ### Stage 2: ESP32 on the 5 V rail
 
-Power off. Connect +5 V (through the 1N5819 if you fitted it) to VIN / 5V, and GND to GND. Power on. **Pass:** the board’s power LED lights, and the 3V3 pin measures about 3.3 V. Switch the bank off, plug in the computer, upload `stage4_switch` again, and confirm the monitor still opens.
+Power off. Connect +5 V (through the 1N5819 if you fitted it) to VIN / 5V, and GND to GND. Power on. **Pass:** the board’s power LED lights, and the 3V3 pin measures about 3.3 V. Switch the bank off, plug in the computer, upload `stage4\_switch` again, and confirm the monitor still opens.
 
 ### Stage 3: LEDs
 
-Env: `stage3_led` (`firmware/src/stages/stage3_led.cpp`).
+Env: `stage3\_led` (`firmware/src/stages/stage3\_led.cpp`).
 
 Start with one group of three. Red to +5 V, white to GND, 1000 µF across them (stripe to GND), green from GPIO18 through 330–470 Ω. Try that direct wire first.
 
-```bash
-pio run -e stage3_led -t upload
+```
+pio run -e stage3\_led -t upload
 ```
 
 You should see red, then green, then blue, then dim white, one LED at a time. Then insert the level shifter as wired above and repeat. Then chain all four groups at the real wire lengths and repeat.
 
-**Pass:** correct colors, in order, no flicker, no random flashes, including through the HiLetgo module. If red and green are swapped, change `GRB` to `RGB` in `stage3_led.cpp` and in the `FastLED.addLeds` line in `firmware/src/main.cpp`. WS2812E color order and the shifter’s speed are bench checks, not settled measurements. If the shifter fails this pass, use a [fallback](#fallback-circuits) and run the stage again.
+**Pass:** correct colors, in order, no flicker, no random flashes, including through the HiLetgo module. If red and green are swapped, change `GRB` to `RGB` in `stage3\_led.cpp` and in the `FastLED.addLeds` line in `firmware/src/main.cpp`. WS2812E color order and the shifter’s speed are bench checks, not settled measurements. If the shifter fails this pass, use a [fallback](#fallback-circuits) and run the stage again.
 
 ### Stage 4: Student switch
 
 Wire tip through the optional 1 kΩ to GPIO32, sleeve to GND.
 
-```bash
-pio run -e stage4_switch -t upload
+```
+pio run -e stage4\_switch -t upload  
 pio device monitor
 ```
 
@@ -469,8 +492,8 @@ Press briefly, then hold. **Pass:** each press prints one `DOWN` and one `UP` li
 
 Wire the button between GPIO33 and GND.
 
-```bash
-pio run -e stage5_pause -t upload
+```
+pio run -e stage5\_pause -t upload  
 pio device monitor
 ```
 
@@ -481,17 +504,19 @@ pio device monitor
 Leave student devices unplugged until the last step of this stage.
 
 1. Jumpers on H. DC+ to +5 V, DC− to GND. Leave IN pins unconnected. Power on. No relay should click. Also tie each IN to GND in turn. Still no click.
+
 2. With the ESP32 powered and sharing GND, touch each IN to the ESP32 3V3 pin. The relay should click on and the board LED should light. Touch that IN to GND. It should click off. Do this for all four inputs. If a channel is weak or silent, stop and build the transistor fallback before continuing.
+
 3. Wire IN1/IN2 to GPIO25, GPIO26, GPIO27, and GPIO14.
 
-```bash
-pio run -e stage6_relay -t upload
+```
+pio run -e stage6\_relay -t upload  
 pio device monitor
 ```
 
 Each relay clicks on and off in turn (about 0.7 s each), and the monitor prints `Relay position 1` through `4`. **Pass:** that cycle, plus a continuity beep across a cord’s tip and sleeve only while that channel is on.
 
-Watch the first second after power-up or reset. If relay 4 blips, GPIO14 is pulsing at boot. Move that channel to GPIO13 and change `PIN_RELAY[3]` (and the stage sketch’s pin list) from 14 to 13. This blip has not been observed yet because the board has not been powered.
+Watch the first second after power-up or reset. If relay 4 blips, GPIO14 is pulsing at boot. Move that channel to GPIO13 and change `PIN\_RELAY\[3\]` (and the stage sketch’s pin list) from 14 to 13. This blip has not been observed yet because the board has not been powered.
 
 Last, plug one cord into a power select box and a battery-powered toy, or whatever the teacher actually uses, and confirm the box responds while that relay is on.
 
@@ -499,8 +524,8 @@ Last, plug one cord into a power select box and a battery-powered toy, or whatev
 
 The switch from Stage 4 stays on GPIO32.
 
-```bash
-pio run -e stage7_keyboard -t upload
+```
+pio run -e stage7\_keyboard -t upload
 ```
 
 On the iPad: Settings → Bluetooth → tap **AAC Scanner**. Open Notes, put the cursor in a note, and long-press the switch. **Pass:** `1` and a new line, then `2`, then `3`, then `4`, then `1` again. This stage sketch sends the digit and Enter when a press of at least 1 s is released, and only while the keyboard is connected. The full firmware sends the key when the long-press time is reached, while the switch is still held. Try the same press in Switch2GO once Notes works.
@@ -509,7 +534,7 @@ iPadOS usually hides the on-screen keyboard while a hardware keyboard is connect
 
 ### Stage 8: Config service
 
-```bash
+```
 pio run -e scanner -t upload
 ```
 
@@ -523,18 +548,19 @@ Leave `scanner` loaded. All four LED groups, both relay boards, the switch, and 
 
 ### Stage 10: Make it permanent
 
-Move the circuit to perfboard or screw terminals. Solder, heat-shrink, and label cords 1–4, boards A and B, SWITCH, PAUSE, and 5V IN. Mount the boards in the printed case. Re-run Stages 3–7 after the case is closed, because wires get bumped. Mount the hoods, route wires on the back of the trifold, and aim the hoods from the student’s seat height.
+Move the circuit to perfboard or screw terminals. Solder, heat-shrink, and label cords 1–4, boards A and B, SWITCH, PAUSE, PORT, and 5V IN. Fit the female 3-prong LED connector in the student-wall port, contacts +5 V, DO/DIN, GND. Mount the boards in the printed case. Re-run Stages 3–7 after the case is closed, because wires get bumped. Mount the hoods, route wires on the back of the trifold, and aim the hoods from the student’s seat height.
 
 ## Choice layout
 
 Each active choice lights exactly one position and uses that position’s relay. Keys are the choice number (`1` through `N`), not the physical position. Flag bit1 in the config still switches a setup to physical-position keys. The table lives in `LAYOUT` in `firmware/src/main.cpp`.
 
 | Choices | What lights | Cords that matter | Keys |
-| --- | --- | --- | --- |
-| 1 | Position 2 only (middle-left). Position 4 stays dark, and so do 1 and 3. | Cord 2 to power select box #1 | `1` |
-| 2 | Position 2, then position 3 | Cord 2 to box #1, cord 3 to box #2 | `1`, `2` |
-| 3 | Positions 1, 2, and 3, each alone. Position 4 stays dark. | Cords 1 and 2 to box #1, cord 3 to box #2 | `1`, `2`, `3` |
-| 4 | Positions 1, 2, 3, 4 | Cords 1 and 2 to box #1, cords 3 and 4 to box #2 | `1`, `2`, `3`, `4` |
+| - | - | - | - |
+| 1 | Position 2 only (middle-left). Position 4 stays dark, and so do 1 and 3. | Cord 2 to power select box \#1 | `1` |
+| 2 | Position 2, then position 3 | Cord 2 to box \#1, cord 3 to box \#2 | `1`, `2` |
+| 3 | Positions 1, 2, and 3, each alone. Position 4 stays dark. | Cords 1 and 2 to box \#1, cord 3 to box \#2 | `1`, `2`, `3` |
+| 4 | Positions 1, 2, 3, 4 | Cords 1 and 2 to box \#1, cords 3 and 4 to box \#2 | `1`, `2`, `3`, `4` |
+
 
 Enter after the digit is on by default (flag bit0).
 
@@ -550,7 +576,7 @@ A press becomes a selection at the moment it has been held for the long-press ti
 
 A press released before the long-press time is a short press. It starts HOLDING: the same choice stays lit for the hold time (default 30 s). Another short press during HOLDING restarts that hold timer. While the switch is held, the hold timer waits. When the hold time runs out, scanning resumes at the next choice.
 
-After a selection the chosen light blinks. Scanning starts again only once the switch is up, the relay is open, and at least 0.8 s have passed (`SELECT_FEEDBACK_MS`). **Still open:** the current firmware then restarts from the first choice (`RESTART_FROM_FIRST_AFTER_SELECT = true`). The alternative is to continue from the next choice. That choice has not been made. Change the constant in `firmware/src/main.cpp` when it is.
+After a selection the chosen light blinks. Scanning starts again only once the switch is up, the relay is open, and at least 0.8 s have passed (`SELECT\_FEEDBACK\_MS`). **Still open:** the current firmware then restarts from the first choice (`RESTART\_FROM\_FIRST\_AFTER\_SELECT = true`). The alternative is to continue from the next choice. That choice has not been made. Change the constant in `firmware/src/main.cpp` when it is.
 
 Pause turns the LEDs off, ignores the switch, and releases any relay. Resume starts at the first choice. Holding PAUSE while power is applied is a different path: config-only BLE, described under the BLE contract. In that mode the light stays off until you reboot.
 
@@ -559,16 +585,17 @@ Pause turns the LEDs off, ignores the switch, and releases any relay. Resume sta
 All of these are in `firmware/src/main.cpp`.
 
 | Constant | Default | Change it when |
-| --- | --- | --- |
-| `PIN_RELAY[3]` | 14 | Relay 4 clicks at boot. Set it to 13. Untested. |
-| `RELAY_ACTIVE_HIGH` | `true` | You moved a JD-VCC board to low-trigger with no transistor. Set it to `false`. |
-| `LED_GLOBAL_MAX_BRIGHTNESS` | 100 | The patch of light is too dim. Raise it slowly and re-measure current. |
-| `RELAY_MIN_MS` | 200 | The box needs a longer minimum closure. |
-| `RELAY_MAX_MS` | 5000 | The box mode needs a longer maximum closure. |
-| `SELECT_FEEDBACK_MS` | 800 | You want a longer or shorter blink before the scan continues. |
-| `RESTART_FROM_FIRST_AFTER_SELECT` | `true` | You choose “continue from the next choice” instead. Still open. |
+| - | - | - |
+| `PIN\_RELAY\[3\]` | 14 | Relay 4 clicks at boot. Set it to 13. Untested. |
+| `RELAY\_ACTIVE\_HIGH` | `true` | You moved a JD-VCC board to low-trigger with no transistor. Set it to `false`. |
+| `LED\_GLOBAL\_MAX\_BRIGHTNESS` | 100 | The patch of light is too dim. Raise it slowly and re-measure current. |
+| `RELAY\_MIN\_MS` | 200 | The box needs a longer minimum closure. |
+| `RELAY\_MAX\_MS` | 5000 | The box mode needs a longer maximum closure. |
+| `SELECT\_FEEDBACK\_MS` | 800 | You want a longer or shorter blink before the scan continues. |
+| `RESTART\_FROM\_FIRST\_AFTER\_SELECT` | `true` | You choose “continue from the next choice” instead. Still open. |
 | `LAYOUT` | see the choice table | Only if a future layout decision changes which position a choice lights. |
-| `KEEPALIVE_ENABLED` | `false` | The keep-alive resistor and MOSFET are built, and the bank still shuts off without them. |
+| `KEEPALIVE\_ENABLED` | `false` | The keep-alive resistor and MOSFET are built, and the bank still shuts off without them. |
+
 
 ## BLE contract
 
@@ -581,18 +608,19 @@ iOS often hides an already-paired keyboard from a BLE scan, because the system o
 iOS caches GATT layouts. If services change after pairing, forget the device under Settings → Bluetooth and pair again.
 
 | Item | UUID | Properties |
-| --- | --- | --- |
+| - | - | - |
 | Scanner service | `A5C00001-7D2B-4F6E-9C31-5B8E2A1D0C4F` | — |
 | Config | `A5C00002-7D2B-4F6E-9C31-5B8E2A1D0C4F` | Read, Write |
 | Status | `A5C00003-7D2B-4F6E-9C31-5B8E2A1D0C4F` | Read, Notify |
 | Command | `A5C00004-7D2B-4F6E-9C31-5B8E2A1D0C4F` | Write |
+
 
 On a long press the device types the choice number (`1`–`N`) then Enter, unless config flag bit1 is set (physical position instead). If that position is set to iPad + relay, the relay still closes when the keyboard is not connected.
 
 **Config** is 29 bytes, version `0x01`, little-endian. A write with the wrong length or version is ignored. Out-of-range times are clamped. An unknown mode is stored as iPad-only. A good write is saved with Preferences (namespace `aacscan`, key `cfg`) and becomes the value a later read returns. A 29-byte write is larger than BLE’s old 20-byte default. iOS usually negotiates a larger MTU. If a write does nothing, confirm the phone actually sent 29 bytes.
 
 | Bytes | Field | Range | Default |
-| --- | --- | --- | --- |
+| - | - | - | - |
 | 0 | version | `0x01` | `0x01` |
 | 1 | numChoices | 1–4 | 4 |
 | 2–3 | scanTenths | 5–600 (0.5–60 s) | 20 (2.0 s) |
@@ -604,37 +632,40 @@ On a long press the device types the choice number (`1`–`N`) then Enter, unles
 | 19–23 | position 3 | same | same |
 | 24–28 | position 4 | same | same |
 
-Mode `0` is iPad only. Mode `1` is iPad + relay. Colors and modes belong to the physical position, so they stay put when the number of choices changes. Per-position brightness is applied under the global cap. The app cannot turn the LEDs up past `LED_GLOBAL_MAX_BRIGHTNESS`.
+
+Mode `0` is iPad only. Mode `1` is iPad + relay. Colors and modes belong to the physical position, so they stay put when the number of choices changes. Per-position brightness is applied under the global cap. The app cannot turn the LEDs up past `LED\_GLOBAL\_MAX\_BRIGHTNESS`.
 
 **Status** is 5 bytes. Notifications go out when any byte changes, and no more often than every 100 ms.
 
 | Byte | Field | Meaning |
-| --- | --- | --- |
+| - | - | - |
 | 0 | state | `0` SCANNING, `1` HOLDING, `2` SELECTING, `3` PAUSED |
 | 1 | choice | Current choice 1–N, or `0` if paused |
 | 2 | position | Primary position 1–4 of that choice, or `0` if paused |
 | 3 | kbConnected | `1` if the BLE keyboard link is up |
 | 4 | holdSecondsLeft | Seconds left in HOLDING, otherwise `0` |
 
+
 **Commands:**
 
 | Bytes | Command |
-| --- | --- |
+| - | - |
 | `01` | Pause |
 | `02` | Resume (starts at the first choice) |
 | `03` | Toggle pause |
 | `10 nn` | Pulse relay position `nn` (`01`–`04`) for about 200 ms. Ignored if a relay is already closed. |
 | `7F A5` | Factory-reset settings to the defaults |
 
+
 ### Example config
 
 Four choices, 2.0 s scan, 30 s hold, 1000 ms long press, Enter on, choice-number keys. Position 1 red with relay, 2 green with relay, 3 blue iPad-only, 4 yellow iPad-only, all at full per-position brightness:
 
 ```
-01 04 14 00 2C 01 E8 03 01
-FF 00 00 FF 01
-00 FF 00 FF 01
-00 00 FF FF 00
+01 04 14 00 2C 01 E8 03 01  
+FF 00 00 FF 01  
+00 FF 00 FF 01  
+00 00 FF FF 00  
 FF FF 00 FF 00
 ```
 
@@ -642,29 +673,33 @@ The iPad app should read and write this layout, subscribe to Status, and capture
 
 ## Prints
 
-Parametric OpenSCAD is in [cad/](cad/). Every dimension below is a starting size. Measure the strip, the jack thread, the button bushing, the board thickness, and the mounting holes, then change the named variables at the top of each file.
+Parametric OpenSCAD is in [cad/](file:///home/grahamthetvi/Projects/Switch2GO_AAC_Companion/cad/). Every dimension below is a starting size. Measure the strip, the jack thread, the button bushing, the board thickness, and the mounting holes, then change the named variables at the top of each file.
 
-```bash
-openscad -o /tmp/led_hood.stl cad/led_hood.scad
-openscad -o /tmp/edge_clip.stl cad/edge_clip.scad
-openscad -D 'part="box"' -o /tmp/case_box.stl cad/electronics_case.scad
-openscad -D 'part="lid"' -o /tmp/case_lid.stl cad/electronics_case.scad
+```
+openscad -o /tmp/led\_hood.stl cad/led\_hood.scad  
+openscad -o /tmp/edge\_clip.stl cad/edge\_clip.scad  
+openscad -D 'part="bottom"' -o /tmp/case\_bottom.stl cad/electronics\_case.scad  
+openscad -D 'part="lid"' -o /tmp/case\_lid.stl cad/electronics\_case.scad
 ```
 
-**Hood** (`cad/led_hood.scad`), one per position. A rectangular snoot matches three LEDs in a row better than a round cone. Starting inner opening about 55 × 14 mm, flaring to about 90–110 × 50–70 mm over a depth of 50–70 mm. Mount it above or beside the choice, tilted about 30–45° toward the surface, mouth about 80–150 mm from the board, opening facing away from the student. Sit at the student’s eye height. If you can see an LED, lengthen the visor or increase the tilt. Check the teacher’s angle too. Matte black PLA, three or more walls. Print the hood mouth-down. The rail in that file is a channel a bit wider than the strip, with a lip and zip-tie slots, a wire slot at the DIN end, and a data-arrow mark.
+**Hood** (`cad/led\_hood.scad`), one per position. A rectangular snoot matches three LEDs in a row better than a round cone. Starting inner opening about 55 × 14 mm, flaring to about 90–110 × 50–70 mm over a depth of 50–70 mm. Mount it above or beside the choice, tilted about 30–45° toward the surface, mouth about 80–150 mm from the board, opening facing away from the student. Sit at the student’s eye height. If you can see an LED, lengthen the visor or increase the tilt. Check the teacher’s angle too. Matte black PLA, three or more walls. Print the hood mouth-down. The rail in that file is a channel a bit wider than the strip, with a lip and zip-tie slots, a wire slot at the DIN end, and a data-arrow mark.
 
-**Edge clip** (`cad/edge_clip.scad`). A U-clip over the top of the panel, with an arm for the hood. Set `panel_thickness` from a measurement. Foam and poster trifolds vary. Other mounts that also work: a small bolt with printed washers on both sides, or hook-and-loop on a flat printed base. Route wires on the back, through printed grommets, with the 3-pin connectors at the folds and slack so the board can close.
+**Edge clip** (`cad/edge\_clip.scad`). A U-clip over the top of the panel, with an arm for the hood. Set `panel\_thickness` from a measurement. Foam and poster trifolds vary. Other mounts that also work: a small bolt with printed washers on both sides, or hook-and-loop on a flat printed base. Route wires on the back, through printed grommets, with the 3-pin connectors at the folds and slack so the board can close.
 
-**Case** (`cad/electronics_case.scad`). Interior starting size 140 × 100 × 45 mm. Lay the real boards on paper first (ESP32, two relay modules, shifter, USB-C breakout, perfboard) and move the holes to match. Walls about 2.4–3 mm. PLA or PETG. Standoffs at the measured hole positions. Keep relay screw terminals reachable.
+**Case** (`cad/electronics\_case.scad`). Adapted from the Switch2Select housing. Outside size 200 × 140 × 55 mm, wall 2.4 mm. PLA or PETG. The lid screws into corner bosses. Lay the ESP32, two relay modules, shifter, USB-C breakout, and perfboard in the box and keep the relay screw terminals reachable.
 
-Cutouts, each measured and then given about 0.3–0.5 mm clearance: USB-C slot with the breakout clamped behind it; student jack (many 3.5 mm panel jacks use about a 6 mm thread) with a flat so it cannot spin, labeled SWITCH; cord exits or four jack holes labeled 1–4; pause hole (often 12 or 16 mm) labeled PAUSE, with a raised ring; a hole aligned with the ESP32 USB port so firmware can be updated with the case closed; power-switch cutout if you fitted one; LED cable exit. Emboss SWITCH, PAUSE, 1 2 3 4, and 5V IN. Lid screws into heat-set inserts. Print a small coupon to test-fit the jack and button holes before the full case. Starting slicer settings: 0.2 mm layers, 3 walls, 20–25% infill.
+Cutouts: one scan-switch jack on the student wall (a 3.5 mm panel jack, about a 9.1 mm hole); four output cord holes, 4 mm across, labeled 1–4, each with its own pair of wrap rods; one pause/resume button hole, 13.4 mm; a 15 × 9.5 mm opening on the student wall, labeled port, for the female 3-prong LED connector (+5 V, DO/DIN, GND); USB-C power inlet on the short wall at the numeral 1 end, cutout bottom 3 mm above the interior floor. No power-rocker cutout and no hold button. Every label is raised print and Grade 1 braille: power, scan, port, pause, and 1–4. Print a small coupon to test-fit the jack, the button, and the port before the full case. Starting slicer settings: 0.2 mm layers, 3 walls, 20–25% infill.
 
 ## For the teacher
 
-1. Plug in the power bank, then the student switch. Label on the case: **5V IN**, **SWITCH**, **PAUSE**, cords **1–4**.
+1. Plug the light strip into **port** (contacts +5 V, DO/DIN, GND), then the power bank, then the student switch. Labels on the case, in print and braille: **power**, **scan**, **port**, **pause**, cords **1–4**.
+
 2. Pair the iPad with **AAC Scanner** in Settings → Bluetooth.
-3. Cords 1 and 2 go to power select box #1; cords 3 and 4 to box #2. With fewer than four choices, unused cords stay unplugged. See the [choice layout](#choice-layout).
+
+3. Cords 1 and 2 go to power select box \#1; cords 3 and 4 to box \#2. With fewer than four choices, unused cords stay unplugged. See the [choice layout](#choice-layout).
+
 4. **PAUSE** turns the lights off and ignores the switch. Resume starts at the first choice.
+
 5. Unplug or plug the switch only while paused.
 
 This is a 5 V USB-bank device. Relays switch only the low-voltage switch lines of the power select boxes. They never switch mains.
@@ -673,12 +708,18 @@ This is a 5 V USB-bank device. Relays switch only the low-voltage switch lines o
 
 These are open. Do not treat them as settled.
 
-- **After a selection.** The firmware blinks, then restarts from the first choice. Continuing from the next choice is the other option. `RESTART_FROM_FIRST_AFTER_SELECT` selects between them. No choice has been made.
-- **GPIO14 at boot.** It may click relay 4. If it does, move `PIN_RELAY[3]` from 14 to 13. Not tried.
+- **After a selection.** The firmware blinks, then restarts from the first choice. Continuing from the next choice is the other option. `RESTART\_FROM\_FIRST\_AFTER\_SELECT` selects between them. No choice has been made.
+
+- **GPIO14 at boot.** It may click relay 4. If it does, move `PIN\_RELAY\[3\]` from 14 to 13. Not tried.
+
 - **Power bank at idle.** About 0.15–0.25 A may or may not hold the bank on. Test for 30–60 minutes. The keep-alive circuit stays optional until that test fails.
+
 - **Level-shifter speed.** The HiLetgo BSS138 module may be marginal at 800 kHz. Stage 3 is the test. Fallbacks stay in this file.
+
 - **3.3 V relay trigger.** H jumpers are what the firmware expects. Whether 3.3 V clicks every channel is Stage 6. Not tried.
+
 - **iOS and the custom service.** A paired keyboard may be invisible to a normal scan. The app should call `retrieveConnectedPeripherals(withServices:)` with the scanner service UUID. Untested. Fallback is hold PAUSE while powering on.
+
 - **Hardware.** Nothing in this project has been powered, scanned, or paired.
 
 ## Safety
@@ -696,7 +737,7 @@ Solder with ventilation, wear safety glasses, wash your hands afterward, and res
 ## Troubleshooting
 
 | What you see | What to try |
-| --- | --- |
+| - | - |
 | Nothing powers on | CC resistors missing, fuse open, or the power switch is off. Measure VBUS. A USB-A-to-C cable bypasses the CC requirement for a quick check. |
 | ESP32 resets when LEDs or a relay turn on | Voltage dip. Confirm the 1000 µF capacitor, shorten and thicken the 5 V wires, lower brightness, try another USB cable. |
 | Board boots alone and fails once wired | A strapping pin is being pulled. Move that wire to a pin in the pin table. |
@@ -707,16 +748,17 @@ Solder with ventilation, wear safety glasses, wash your hands afterward, and res
 | Far LEDs look yellow | Inject +5 V and GND at group 4. Use thicker power wire. |
 | Relay never clicks from the ESP32 | Run the 3.3 V touch test. Jumper should be on H. If 3.3 V is not enough, add the transistor. |
 | Relay stuck on or buzzing | L mode with a 3.3 V high that does not fully turn the optocoupler off. Use H mode, or the transistor, or a JD-VCC board with VCC at 3.3 V. |
-| Relay 4 clicks at power-up | Move that channel to GPIO13 and set `PIN_RELAY[3]` to 13. |
+| Relay 4 clicks at power-up | Move that channel to GPIO13 and set `PIN\_RELAY\[3\]` to 13. |
 | Relay clicks, box does nothing | Cord is not actually tip and sleeve, or the box port/mode is wrong. Prove the box with a normal switch, then continuity-test the cord while the relay is on. |
-| Double presses | Raise `DEBOUNCE_MS`, add the 100 nF on GPIO32, keep switch wires away from relay wiring. |
+| Double presses | Raise `DEBOUNCE\_MS`, add the 100 nF on GPIO32, keep switch wires away from relay wiring. |
 | A press when the plug goes in | The jack shorts tip to sleeve as the plug seats. Pause before plugging. |
 | iPad does not list AAC Scanner | Forget the device, reboot the ESP32, pair again. |
 | Keys reach Notes and the app ignores them | The app is not taking hardware key events. Notes is the Stage 7 proof. The app has to handle those keys itself. |
 | Config write does nothing | Serial log says `rejected write`, or iOS cached an old GATT. Send exactly 29 bytes starting with `01`. Forget and re-pair. |
 | App cannot see the custom service | Use `retrieveConnectedPeripherals(withServices:)` with the scanner service UUID, or hold PAUSE at power-on. |
-| `BleKeyboard` compile errors | Stay on NimBLE 1.4.x and Espressif32 6.x, and keep `-D USE_NIMBLE`. |
+| `BleKeyboard` compile errors | Stay on NimBLE 1.4.x and Espressif32 6.x, and keep `-D USE\_NIMBLE`. |
 | Power bank turns off | Low-current mode, a different bank, or the keep-alive circuit after you measure idle current. |
+
 
 ## Bench checklist
 
@@ -725,46 +767,70 @@ Copy this onto paper. Fill in the current readings.
 **Power**
 
 - No steady continuity beep between +5 V and GND before the first power-up
+
 - +5 V rail reads 4.8–5.2 V from the bank
+
 - ESP32 3V3 pin reads about 3.3 V
-- Idle current: ____ A. Peak current: ____ A
+
+- Idle current: \_\_\_\_ A. Peak current: \_\_\_\_ A
+
 - Bank still on after 60 minutes of scanning (open until tested)
+
 - Nothing warm except the keep-alive resistor, if you built it
 
 **LEDs**
 
 - All 12 light in order, direct and then through the shifter
+
 - No flicker at the final wire lengths
+
 - The patch is visible in the room at the brightness cap
+
 - From the student’s seat, no LED is directly visible
 
 **Switch and pause**
 
 - Short press holds the lit choice, then scanning continues at the next choice
+
 - Long press selects once
+
 - The light does not move while the switch is held
+
 - Pause blanks the LEDs and ignores the switch. Resume starts at the first choice
+
 - Plugging the switch while paused does not select anything
 
 **Relays**
 
 - No click at power-up or reset (watch position 4)
+
 - A relay closes only for a position set to iPad + relay
+
 - It stays closed while the switch is held, stays at least 200 ms, and opens on release
+
 - It opens by 5 s even if the switch is still held
-- Cords 1–2 work in box #1 and cords 3–4 in box #2
+
+- Cords 1–2 work in box \#1 and cords 3–4 in box \#2
+
 - iPad-only positions never click
 
 **Bluetooth**
 
 - iPad pairs with AAC Scanner. Notes shows `1` and a newline through `4`
+
 - Switch2GO responds for 1, 2, 3, and 4 choices
+
 - The keyboard reconnects after the ESP32 power-cycles (untested)
+
 - The example config changes behavior and survives power-off
+
 - Status notifications follow scanning, holding, paused, and keyboard connected
+
 - A config write of the wrong length is rejected and the device keeps running
 
 **Endurance, when the bench unit exists**
 
 - One hour with periodic presses: no freeze, reset, or missed press
+
 - Trifold folded and unfolded 10 times with no LED dropouts
+
