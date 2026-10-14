@@ -28,7 +28,8 @@ Bench sketches are the files in `firmware/src/stages/`. Upload the matching env.
 | `stage4\_switch` | `firmware/src/stages/stage4\_switch.cpp` | Student jack on GPIO32 |
 | `stage5\_pause` | `firmware/src/stages/stage5\_pause.cpp` | Pause button on GPIO33 |
 | `stage6\_relay` | `firmware/src/stages/stage6\_relay.cpp` | Relays on GPIO25, GPIO26, GPIO27, GPIO14 |
-| `stage7\_keyboard` | `firmware/src/stages/stage7\_keyboard.cpp` | BLE HID keys only |
+| `stage7\_keyboard` | `firmware/src/stages/stage7\_keyboard.cpp` | BLE HID keys only (supports BOOT button or GPIO32) |
+| `stage8\_ios\_sim` | `firmware/src/stages/stage8\_ios\_sim.cpp` | Full iOS simulation: BLE keyboard + GATT config service + BOOT button switch simulation |
 
 
 Example: `pio run -e stage3\_led -t upload`
@@ -603,17 +604,32 @@ Last, plug one cord into a power select box and a battery-powered toy, or whatev
 
 ### Stage 7: Bluetooth keyboard
 
-The switch from Stage 4 stays on GPIO32.
+The switch from Stage 4 stays on GPIO32. You can also use the onboard **BOOT button (GPIO0)** on the ESP32 dev board to test without external switch wiring. (Note: the **EN button** is hardware reset and cannot be used as an input).
 
 ```
 pio run -e stage7\_keyboard -t upload
 ```
 
-On the iPad: Settings → Bluetooth → tap **AAC Scanner**. Open Notes, put the cursor in a note, and long-press the switch. **Pass:** `1` and a new line, then `2`, then `3`, then `4`, then `1` again. This stage sketch sends the digit and Enter when a press of at least 1 s is released, and only while the keyboard is connected. The full firmware sends the key when the long-press time is reached, while the switch is still held. Try the same press in Switch2GO once Notes works.
+On the iPad: Settings → Bluetooth → tap **AAC Scanner**. Open Notes, put the cursor in a note, and long-press the switch or BOOT button (≥ 1 s). **Pass:** `1` and a new line, then `2`, then `3`, then `4`, then `1` again. The onboard LED (GPIO2) blinks while advertising and stays solid when connected to iOS.
 
 iPadOS usually hides the on-screen keyboard while a hardware keyboard is connected. That is acceptable: Switch2GO captures the hardware keys.
 
-### Stage 8: Config service
+### Stage 8: iOS simulation & Config service
+
+For a full standalone simulation of the ESP32 connecting to an iOS device (both BLE HID keyboard and GATT configuration/status service):
+
+```
+pio run -e stage8\_ios\_sim -t upload
+```
+
+This bench simulator runs entirely on the bare ESP32-WROOM-32 board:
+- Advertises as **AAC Scanner** with both the BLE keyboard and the custom GATT service (`A5C00001-7D2B-4F6E-9C31-5B8E2A1D0C4F`).
+- **BOOT button (GPIO0)** simulates the student switch:
+  - **Short press** (< 1 s): enters HOLDING state (pauses scan on current choice).
+  - **Long press** (≥ 1 s): fires selection, types `1`–`4` + Enter to iOS, blinks LED, and updates Status characteristic.
+- Serial terminal (115200 baud) accepts commands: `'s'` (short press), `'l'` (long press), `'p'` (pause), `'c'` (print status).
+
+You can also test the full firmware config service directly with:
 
 ```
 pio run -e scanner -t upload

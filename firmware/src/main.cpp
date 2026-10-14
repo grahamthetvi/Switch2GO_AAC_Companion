@@ -24,8 +24,9 @@
 
 // ============================== PINS ==============================
 #define PIN_LED_DATA 18                                   // -> level shifter LV1
-static const uint8_t PIN_SWITCH = 32;                     // 3.5mm jack tip (sleeve->GND)
-static const uint8_t PIN_PAUSE  = 33;                     // button to GND
+static const uint8_t PIN_SWITCH   = 32;                     // 3.5mm jack tip (sleeve->GND)
+static const uint8_t PIN_BOOT_BTN = 0;                      // onboard BOOT button (bench testing)
+static const uint8_t PIN_PAUSE    = 33;                     // button to GND
 static const uint8_t PIN_RELAY[4] = {25, 26, 27, 14};     // positions 1..4 (14 -> 13 if it clicks at boot)
 static const uint8_t PIN_KEEPALIVE = 4;                   // optional MOSFET dummy load
 
@@ -146,15 +147,17 @@ CRGB leds[NUM_LEDS];
 
 // ---------------------------- Debouncer ---------------------------
 struct Debouncer {
-  uint8_t pin = 0; bool stable = false, lastRaw = false; uint32_t lastChange = 0;
+  uint8_t pin = 0; uint8_t altPin = 255; bool stable = false, lastRaw = false; uint32_t lastChange = 0;
   bool rose = false, fell = false;   // rose = just pressed, fell = just released
-  void begin(uint8_t p) {
+  void begin(uint8_t p, uint8_t alt = 255) {
     pin = p; pinMode(pin, INPUT_PULLUP);
-    lastRaw = stable = (digitalRead(pin) == LOW);
+    altPin = alt;
+    if (altPin != 255) pinMode(altPin, INPUT_PULLUP);
+    lastRaw = stable = (digitalRead(pin) == LOW || (altPin != 255 && digitalRead(altPin) == LOW));
   }
   void update(uint32_t now) {
     rose = fell = false;
-    bool raw = (digitalRead(pin) == LOW);  // LOW = pressed
+    bool raw = (digitalRead(pin) == LOW) || (altPin != 255 && digitalRead(altPin) == LOW);  // LOW = pressed
     if (raw != lastRaw) { lastRaw = raw; lastChange = now; }
     if ((now - lastChange) >= DEBOUNCE_MS && raw != stable) {
       stable = raw;
@@ -389,7 +392,7 @@ void setup() {
   delay(50);
   Serial.println("\nAAC Switch Scanner (UNTESTED starter firmware)");
 
-  sw.begin(PIN_SWITCH);
+  sw.begin(PIN_SWITCH, PIN_BOOT_BTN);
   pauseBtn.begin(PIN_PAUSE);
 
   FastLED.addLeds<WS2812B, PIN_LED_DATA, GRB>(leds, NUM_LEDS);   // WS2812E: color order to verify
