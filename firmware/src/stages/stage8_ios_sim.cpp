@@ -208,7 +208,8 @@ void publishStatus(uint32_t now) {
 // Send short press keystroke to iOS
 void sendShortPressKey(uint8_t choiceIndex) {
   char key = '1' + choiceIndex;
-  Serial.printf("\n>>> [SHORT PRESS TO iOS] Choice %u (Key '%c') <<<\n", choiceIndex + 1, key);
+  Serial.printf("\n>>> [SHORT PRESS TO iOS] Choice %u of %u (Key '%c') <<<\n",
+                choiceIndex + 1, cfg.numChoices, key);
   if (kb.isConnected()) {
     kb.write((uint8_t)key);
     Serial.printf("    [BLE HID] Transmitted '%c' to iOS\n", key);
@@ -224,7 +225,7 @@ void sendShortPressKey(uint8_t choiceIndex) {
   curChoice = (choiceIndex + 1) % cfg.numChoices;
   selectStart = millis();
   state = State::SELECTING;
-  Serial.printf("    [NEXT CHOICE] Now queued: Choice %u\n", curChoice + 1);
+  Serial.printf("    [NEXT CHOICE] Now queued: Choice %u of %u\n", curChoice + 1, cfg.numChoices);
 }
 
 // Reads BOOT button (GPIO 0, active LOW) or external switch (GPIO 32, active LOW)
@@ -315,11 +316,23 @@ void loop() {
       sendShortPressKey(curChoice);
     } else if (ch >= '1' && ch <= '4') {
       sendShortPressKey(ch - '1');
+    } else if (ch == '+') {
+      cfg.numChoices = (cfg.numChoices >= 4) ? 1 : cfg.numChoices + 1;
+      if (curChoice >= cfg.numChoices) curChoice = 0;
+      saveConfig();
+      Serial.printf("\n[CONFIG] Manually changed active choices to: %u\n", cfg.numChoices);
+    } else if (ch == '-') {
+      cfg.numChoices = (cfg.numChoices <= 1) ? 4 : cfg.numChoices - 1;
+      if (curChoice >= cfg.numChoices) curChoice = 0;
+      saveConfig();
+      Serial.printf("\n[CONFIG] Manually changed active choices to: %u\n", cfg.numChoices);
     } else if (ch == 'p' || ch == 'P') {
       state = (state == State::PAUSED) ? State::SCANNING : State::PAUSED;
       Serial.printf("[STATE] %s\n", stateName(state));
     } else if (ch == 'c' || ch == 'C') {
-      Serial.printf("[INFO] Choice=%u, BLE=%s\n", curChoice + 1, connected ? "CONNECTED" : "ADVERTISING");
+      Serial.printf("\n[INFO] Active Choices=%u, Current Choice=%u, BLE=%s\n",
+                    cfg.numChoices, curChoice + 1, connected ? "CONNECTED" : "ADVERTISING");
+      Serial.println("Commands: Space/'s'=tap switch, '+'/'1'-'4'=set choices, 'p'=pause");
     }
   }
 
@@ -384,10 +397,13 @@ void loop() {
     Config c;
     if (unpackConfig(localCfg, nCfg, c)) {
       cfg = c;
+      if (curChoice >= cfg.numChoices) curChoice = 0;
       saveConfig();
       uint8_t buf[CFG_LEN]; packConfig(cfg, buf);
       if (cfgChar) cfgChar->setValue(buf, CFG_LEN);
-      Serial.printf("[BLE GATT] Config updated from iOS app.\n");
+      Serial.printf("\n[BLE GATT] *** iOS App Updated Active Choices to: %u ***\n", cfg.numChoices);
+    } else {
+      Serial.printf("\n[BLE GATT] Config write rejected (len=%u)\n", (unsigned)nCfg);
     }
   }
 
